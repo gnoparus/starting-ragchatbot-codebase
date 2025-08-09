@@ -241,8 +241,113 @@ header h1 {
 }
 
 .sources-content {
-    padding: 0 0.5rem 0.25rem 1.5rem;
+    padding: 0.75rem 0.5rem 0.5rem 1.5rem;
     color: var(--text-secondary);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    align-items: flex-start;
+}
+
+.source-link {
+    display: inline-block;
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 0.5rem 0.75rem;
+    margin: 0.25rem 0.25rem 0.25rem 0;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.12) 100%);
+    border: 1px solid rgba(37, 99, 235, 0.3);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    line-height: 1.4;
+}
+
+.source-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.source-link:hover::before {
+    left: 100%;
+}
+
+.source-link:hover {
+    color: white;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    border-color: var(--primary-hover);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+}
+
+.source-link:active {
+    transform: translateY(-1px) scale(1.01);
+    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.source-link:focus {
+    outline: none;
+    ring: 2px solid rgba(37, 99, 235, 0.5);
+    ring-offset: 2px;
+}
+
+.source-link::after {
+    content: '↗';
+    margin-left: 0.5rem;
+    opacity: 0.7;
+    font-size: 0.7rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.source-link:hover::after {
+    opacity: 1;
+    transform: translate(2px, -2px);
+}
+
+/* Animation for when sources appear */
+@keyframes sourceSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.source-link {
+    animation: sourceSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.source-link:nth-child(1) { animation-delay: 0.1s; }
+.source-link:nth-child(2) { animation-delay: 0.2s; }
+.source-link:nth-child(3) { animation-delay: 0.3s; }
+.source-link:nth-child(4) { animation-delay: 0.4s; }
+.source-link:nth-child(5) { animation-delay: 0.5s; }
+
+/* Style for non-clickable source text */
+.source-text {
+    display: inline-block;
+    padding: 0.5rem 0.75rem;
+    margin: 0.25rem 0.25rem 0.25rem 0;
+    background: rgba(148, 163, 184, 0.1);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    animation: sourceSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 /* Markdown formatting styles */
