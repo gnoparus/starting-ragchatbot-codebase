@@ -88,7 +88,7 @@ class CourseSearchTool(Tool):
     def _format_results(self, results: SearchResults) -> str:
         """Format search results with course and lesson context"""
         formatted = []
-        sources = []  # Track sources for the UI with links
+        sources_dict = {}  # Track unique sources by course/lesson combination
         
         for doc, meta in zip(results.documents, results.metadata):
             course_title = meta.get('course_title', 'unknown')
@@ -100,27 +100,32 @@ class CourseSearchTool(Tool):
                 header += f" - Lesson {lesson_num}"
             header += "]"
             
-            # Track source for the UI with lesson link if available
-            source_text = course_title
-            if lesson_num is not None:
-                source_text += f" - Lesson {lesson_num}"
+            # Create unique key for deduplication
+            source_key = (course_title, lesson_num)
             
-            # Try to get lesson link from vector store
-            lesson_link = None
-            if lesson_num is not None:
-                lesson_link = self.store.get_lesson_link(course_title, lesson_num)
-            
-            # Create structured source object
-            source_obj = {
-                "text": source_text,
-                "link": lesson_link
-            }
-            sources.append(source_obj)
+            # Only add source if we haven't seen this course/lesson combination
+            if source_key not in sources_dict:
+                # Track source for the UI with lesson link if available
+                source_text = course_title
+                if lesson_num is not None:
+                    source_text += f" - Lesson {lesson_num}"
+                
+                # Try to get lesson link from vector store
+                lesson_link = None
+                if lesson_num is not None:
+                    lesson_link = self.store.get_lesson_link(course_title, lesson_num)
+                
+                # Create structured source object
+                source_obj = {
+                    "text": source_text,
+                    "link": lesson_link
+                }
+                sources_dict[source_key] = source_obj
             
             formatted.append(f"{header}\n{doc}")
         
-        # Store sources for retrieval
-        self.last_sources = sources
+        # Store deduplicated sources for retrieval
+        self.last_sources = list(sources_dict.values())
         
         return "\n\n".join(formatted)
 

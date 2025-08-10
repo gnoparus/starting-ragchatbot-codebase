@@ -88,8 +88,12 @@ Provide only the direct answer to what was asked.
         response = self.client.messages.create(**api_params)
         
         # Handle tool execution if needed
-        if response.stop_reason == "tool_use" and tool_manager:
-            return self._handle_tool_execution(response, api_params, tool_manager)
+        if response.stop_reason == "tool_use":
+            if tool_manager:
+                return self._handle_tool_execution(response, api_params, tool_manager)
+            else:
+                # Tool use requested but no tool manager provided
+                return "Error: Tool use requested but no tool manager provided"
         
         # Return direct response
         return response.content[0].text
