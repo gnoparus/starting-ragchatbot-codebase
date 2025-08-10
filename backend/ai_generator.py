@@ -137,6 +137,8 @@ Provide only the direct answer to what was asked.
                 log.success(
                     "Received API response",
                     stop_reason=response.stop_reason,
+                    content_length=len(response.content) if response.content else 0,
+                    content_types=[c.type for c in response.content] if response.content else [],
                     usage_input_tokens=response.usage.input_tokens if response.usage else None,
                     usage_output_tokens=response.usage.output_tokens if response.usage else None
                 )
@@ -145,6 +147,11 @@ Provide only the direct answer to what was asked.
                 if response.stop_reason == "tool_use" and not tool_manager:
                     log.warning("Tool use requested but no tool manager provided")
                     return "Error: Tool use requested but no tool manager provided"
+                
+                # Check if content is available
+                if not response.content or len(response.content) == 0:
+                    log.error("No content in API response")
+                    return "Error: Empty response from AI service"
                 
                 return response.content[0].text
                 
@@ -203,6 +210,11 @@ Provide only the direct answer to what was asked.
         
         # Get final response
         final_response = self.client.messages.create(**final_params)
+        
+        # Check if content is available
+        if not final_response.content or len(final_response.content) == 0:
+            return "Error: Empty response from AI service"
+        
         return final_response.content[0].text
     
     def _execute_tool_rounds(self, messages: List, system_content: str, 
@@ -334,8 +346,35 @@ Provide only the direct answer to what was asked.
                 "system": system_content
             }
             
+            log.debug(
+                "Making final API call",
+                messages_count=len(messages),
+                system_length=len(system_content),
+                params_keys=list(final_params.keys())
+            )
+            
             final_response = self.client.messages.create(**final_params)
+            
+            log.debug(
+                "Final API response received",
+                stop_reason=final_response.stop_reason,
+                content_length=len(final_response.content) if final_response.content else 0,
+                content_types=[c.type for c in final_response.content] if final_response.content else [],
+                usage_input=final_response.usage.input_tokens if final_response.usage else None,
+                usage_output=final_response.usage.output_tokens if final_response.usage else None
+            )
+            
+            # Check if content is available
+            if not final_response.content or len(final_response.content) == 0:
+                log.error("No content in final API response")
+                return "Error: Empty response from AI service"
+            
             return final_response.content[0].text
             
         except Exception as e:
+            log.error(
+                "Exception in final response generation",
+                error=str(e),
+                error_type=type(e).__name__
+            )
             return f"Error generating final response: {str(e)}"
