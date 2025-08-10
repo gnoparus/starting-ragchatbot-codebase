@@ -128,11 +128,16 @@ class TestRAGIntegration:
                 mock_tool_block.input = {"query": "introduction"}
                 mock_tool_response.content = [mock_tool_block]
                 
-                # Second response - final answer
+                # Second response - no more tool use (early termination)
+                mock_non_tool_response = Mock()
+                mock_non_tool_response.stop_reason = "end_turn"
+                mock_non_tool_response.content = [Mock(text="Direct answer")]
+                
+                # Third response - final synthesis
                 mock_final_response = Mock()
                 mock_final_response.content = [Mock(text="Based on the course content, the introduction covers basic concepts.")]
                 
-                mock_client.messages.create.side_effect = [mock_tool_response, mock_final_response]
+                mock_client.messages.create.side_effect = [mock_tool_response, mock_non_tool_response, mock_final_response]
                 
                 # Import and create RAG system with test config
                 from rag_system import RAGSystem
@@ -149,8 +154,8 @@ class TestRAGIntegration:
                 assert response == "Based on the course content, the introduction covers basic concepts."
                 assert isinstance(sources, list)
                 
-                # Check that the Claude API was called correctly
-                assert mock_client.messages.create.call_count == 2
+                # Check that the Claude API was called correctly (now with sequential tool calling)
+                assert mock_client.messages.create.call_count == 3
                 
         finally:
             # Cleanup
@@ -200,11 +205,16 @@ class TestRAGIntegration:
             mock_tool_block.input = {"query": "test search"}
             mock_tool_response.content = [mock_tool_block]
             
+            # Mock non-tool response (early termination)
+            mock_non_tool_response = Mock()
+            mock_non_tool_response.stop_reason = "end_turn"
+            mock_non_tool_response.content = [Mock(text="Direct response")]
+            
             # Mock final response
             mock_final_response = Mock()
             mock_final_response.content = [Mock(text="Here's the answer based on search results")]
             
-            mock_client.messages.create.side_effect = [mock_tool_response, mock_final_response]
+            mock_client.messages.create.side_effect = [mock_tool_response, mock_non_tool_response, mock_final_response]
             
             # Create real components
             from ai_generator import AIGenerator
