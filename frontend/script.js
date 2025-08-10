@@ -168,12 +168,28 @@ function escapeHtml(text) {
 // Removed removeMessage function - no longer needed since we handle loading differently
 
 async function createNewSession() {
+    const previousSessionId = currentSessionId;
     currentSessionId = null;
+    
+    logInfo('Creating new session', {
+        previousSessionId,
+        clearingMessages: true
+    });
+    
     chatMessages.innerHTML = '';
     addMessage('Welcome to the Course Materials Assistant! I can help you with questions about courses, lessons and specific content. What would you like to know?', 'assistant', null, true);
+    
+    logDebug('New session created successfully');
 }
 
 function clearCurrentChat() {
+    const previousSessionId = currentSessionId;
+    
+    logInfo('Clearing current chat', {
+        previousSessionId,
+        messageCount: chatMessages?.children?.length || 0
+    });
+    
     // Clear chat messages and reset session
     chatMessages.innerHTML = '';
     currentSessionId = null;
@@ -185,17 +201,32 @@ function clearCurrentChat() {
     if (chatInput) {
         chatInput.focus();
     }
+    
+    logDebug('Chat cleared successfully');
 }
 
 // Load course statistics
 async function loadCourseStats() {
     try {
-        console.log('Loading course stats...');
+        logInfo('Loading course stats...');
+        
+        const timer = startTimer('loadCourseStats');
         const response = await fetch(`${API_URL}/courses`);
+        
+        logDebug('Course stats API response', {
+            status: response.status,
+            ok: response.ok
+        });
+        
         if (!response.ok) throw new Error('Failed to load course stats');
         
         const data = await response.json();
-        console.log('Course data received:', data);
+        logInfo('Course data received', {
+            totalCourses: data.total_courses,
+            courseTitlesCount: data.course_titles?.length || 0
+        });
+        
+        timer.end();
         
         // Update stats in UI
         if (totalCourses) {
@@ -214,7 +245,10 @@ async function loadCourseStats() {
         }
         
     } catch (error) {
-        console.error('Error loading course stats:', error);
+        logError('Error loading course stats', {
+            error: error.message,
+            errorType: error.constructor.name
+        });
         // Set default values on error
         if (totalCourses) {
             totalCourses.textContent = '0';
@@ -224,3 +258,14 @@ async function loadCourseStats() {
         }
     }
 }
+
+// Display debug info message on load
+window.addEventListener('load', () => {
+    if (DEBUG_ENABLED) {
+        console.info('%c🔍 Debug logging is ENABLED', 'color: #00ff00; font-weight: bold;');
+        console.info('To disable: localStorage.removeItem(\"ragchat_debug\") and reload');
+    } else {
+        console.info('%c📋 RAG Chat Bot loaded successfully', 'color: #0066cc; font-weight: bold;');
+        console.info('To enable debug logging: localStorage.setItem(\"ragchat_debug\", \"true\") and reload');
+    }
+});
