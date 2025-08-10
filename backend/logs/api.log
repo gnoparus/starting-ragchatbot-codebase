@@ -1,2 +1,0 @@
-2025-08-10 12:56:04.509 | INFO     | API | {'api': True, 'logger_name': 'test_api', 'request_id': 'ceb4f8e6', 'method': 'POST', 'endpoint': '/test', 'client_ip': '127.0.0.1'} | API Request
-2025-08-10 12:56:04.509 | SUCCESS  | API | {'api': True, 'logger_name': 'test_api', 'request_id': 'ceb4f8e6', 'status_code': 200, 'response_time': '150ms'} | API Response
