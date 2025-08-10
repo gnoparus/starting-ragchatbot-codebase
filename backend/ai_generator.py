@@ -1,8 +1,19 @@
 import anthropic
 from typing import List, Optional, Dict, Any, Tuple
+from logger import get_logger, log_execution_time
+import time
+
+# Initialize logger for this module
+log = get_logger("ai_generator")
 
 class AIGenerator:
     """Handles interactions with Anthropic's Claude API for generating responses"""
+    
+    def __init__(self, api_key: str, model: str):
+        log.info("Initializing AI Generator", model=model)
+        self.client = anthropic.Anthropic(api_key=api_key)
+        self.model = model
+        log.success("AI Generator initialized successfully")
     
     # Static system prompt to avoid rebuilding on each call
     SYSTEM_PROMPT = """ You are an AI assistant specialized in course materials and educational content with access to comprehensive search and outline tools for course information.
@@ -44,6 +55,7 @@ Provide only the direct answer to what was asked.
 """
     
     def __init__(self, api_key: str, model: str):
+        log.info("Initializing AI Generator", model=model)
         self.client = anthropic.Anthropic(api_key=api_key)
         self.model = model
         
@@ -53,7 +65,9 @@ Provide only the direct answer to what was asked.
             "temperature": 0,
             "max_tokens": 800
         }
+        log.success("AI Generator initialized successfully")
     
+    @log_execution_time("generate_response")
     def generate_response(self, query: str,
                          conversation_history: Optional[str] = None,
                          tools: Optional[List] = None,
@@ -72,6 +86,15 @@ Provide only the direct answer to what was asked.
             Generated response as string
         """
         
+        log.info(
+            "Generating AI response",
+            query_length=len(query),
+            has_history=bool(conversation_history),
+            tools_available=len(tools) if tools else 0,
+            has_tool_manager=bool(tool_manager),
+            query_preview=query[:100] + "..." if len(query) > 100 else query
+        )
+        
         # Build system content efficiently
         system_content = (
             f"{self.SYSTEM_PROMPT}\n\nPrevious conversation:\n{conversation_history}"
@@ -84,6 +107,7 @@ Provide only the direct answer to what was asked.
         
         # Use sequential tool calling if tools and tool manager are available
         if tools and tool_manager:
+            log.debug("Using sequential tool calling approach", max_rounds=2, tools_count=len(tools))
             return self._execute_tool_rounds(
                 messages=initial_messages,
                 system_content=system_content,
@@ -92,6 +116,7 @@ Provide only the direct answer to what was asked.
                 max_rounds=2
             )
         else:
+            log.debug("Using direct response approach", has_tools=bool(tools))
             # Direct response - include tools even if no tool_manager for compatibility
             api_params = {
                 **self.base_params,
@@ -103,14 +128,34 @@ Provide only the direct answer to what was asked.
             if tools:
                 api_params["tools"] = tools
                 api_params["tool_choice"] = {"type": "auto"}
+                log.debug(f"Added {len(tools)} tools to API call")
             
-            response = self.client.messages.create(**api_params)
-            
-            # Handle case where tools are used but no tool_manager provided
-            if response.stop_reason == "tool_use" and not tool_manager:
-                return "Error: Tool use requested but no tool manager provided"
-            
-            return response.content[0].text
+            try:
+                log.debug("Calling Anthropic API", model=self.model, temperature=self.base_params["temperature"])
+                response = self.client.messages.create(**api_params)
+                
+                log.success(
+                    "Received API response",
+                    stop_reason=response.stop_reason,
+                    usage_input_tokens=response.usage.input_tokens if response.usage else None,
+                    usage_output_tokens=response.usage.output_tokens if response.usage else None
+                )
+                
+                # Handle case where tools are used but no tool_manager provided
+                if response.stop_reason == "tool_use" and not tool_manager:
+                    log.warning("Tool use requested but no tool manager provided")
+                    return "Error: Tool use requested but no tool manager provided"
+                
+                return response.content[0].text
+                
+            except Exception as e:
+                log.error(
+                    "Error in direct API call",
+                    error=str(e),
+                    error_type=type(e).__name__,
+                    query_preview=query[:100] + "..." if len(query) > 100 else query
+                )
+                raise
     
     def _handle_tool_execution(self, initial_response, base_params: Dict[str, Any], tool_manager):
         """
@@ -261,7 +306,13 @@ Provide only the direct answer to what was asked.
             
         except Exception as e:
             # Handle API errors - stop execution
-            print(f"API error in round {round_num}: {e}")
+            log.error(
+                f"Anthropic API error in round {round_num}",
+                round_num=round_num,
+                error=str(e),
+                error_type=type(e).__name__,
+                query_preview=query[:100] + "..." if len(query) > 100 else query
+            )
             return False, messages
     
     def _generate_final_response(self, messages: List, system_content: str) -> str:

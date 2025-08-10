@@ -1,0 +1,1 @@
+2025-08-10 12:56:04.509 | ERROR    | __main__:test_basic_logging:27 | {'logger_name': 'test_module', 'error_type': 'test_error'} | Error message

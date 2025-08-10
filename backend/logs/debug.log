@@ -1,0 +1,80 @@
+2025-08-10 12:55:16.915 | INFO     | __main__:<module>:1 | {'logger_name': 'test', 'test_param': 'success'} | Logging system test
+2025-08-10 12:55:33.348 | INFO     | __main__:<module>:5 | {'logger_name': 'config_test', 'log_level': 'INFO', 'log_to_console': True, 'log_to_file': True, 'chunk_size': 800} | Configuration loaded
+2025-08-10 12:55:33.348 | SUCCESS  | __main__:<module>:11 | {'logger_name': 'config_test'} | Configuration test completed
+2025-08-10 12:56:04.458 | INFO     | app:<module>:24 | {'logger_name': 'app'} | Initializing Course Materials RAG System
+2025-08-10 12:56:04.458 | INFO     | app:<module>:43 | {'logger_name': 'app', 'config': {'chunk_size': 800, 'max_results': 5, 'anthropic_model': 'claude-sonnet-4-20250514', 'embedding_model': 'all-MiniLM-L6-v2'}} | Initializing RAG system with config
+2025-08-10 12:56:04.458 | INFO     | rag_system:__init__:19 | {'logger_name': 'rag_system', 'config_chunk_size': 800, 'config_max_results': 5} | Initializing RAG System
+2025-08-10 12:56:04.458 | DEBUG    | rag_system:__init__:24 | {'logger_name': 'rag_system'} | Initializing document processor
+2025-08-10 12:56:04.458 | DEBUG    | rag_system:__init__:27 | {'logger_name': 'rag_system', 'chroma_path': './chroma_db', 'embedding_model': 'all-MiniLM-L6-v2'} | Initializing vector store
+2025-08-10 12:56:04.458 | INFO     | vector_store:__init__:42 | {'logger_name': 'vector_store', 'chroma_path': './chroma_db', 'embedding_model': 'all-MiniLM-L6-v2', 'max_results': 5} | Initializing VectorStore
+2025-08-10 12:56:04.458 | DEBUG    | vector_store:__init__:47 | {'logger_name': 'vector_store', 'path': './chroma_db'} | Creating ChromaDB persistent client
+2025-08-10 12:56:04.509 | DEBUG    | __main__:test_basic_logging:23 | {'logger_name': 'test_module', 'extra_data': 'debug_value'} | Debug message
+2025-08-10 12:56:04.509 | INFO     | __main__:test_basic_logging:24 | {'logger_name': 'test_module', 'config_test': True} | Info message
+2025-08-10 12:56:04.509 | SUCCESS  | __main__:test_basic_logging:25 | {'logger_name': 'test_module'} | Success message
+2025-08-10 12:56:04.509 | WARNING  | __main__:test_basic_logging:26 | {'logger_name': 'test_module'} | Warning message
+2025-08-10 12:56:04.509 | ERROR    | __main__:test_basic_logging:27 | {'logger_name': 'test_module', 'error_type': 'test_error'} | Error message
+2025-08-10 12:56:04.509 | INFO     | __main__:test_api_logging:37 | {'api': True, 'logger_name': 'test_api', 'request_id': 'ceb4f8e6', 'method': 'POST', 'endpoint': '/test', 'client_ip': '127.0.0.1'} | API Request
+2025-08-10 12:56:04.509 | SUCCESS  | __main__:test_api_logging:43 | {'api': True, 'logger_name': 'test_api', 'request_id': 'ceb4f8e6', 'status_code': 200, 'response_time': '150ms'} | API Response
+2025-08-10 12:56:04.509 | DEBUG    | logger:wrapper:137 | {'function': 'test_performance'} | Starting execution of test_performance
+2025-08-10 12:56:04.537 | DEBUG    | vector_store:__init__:54 | {'logger_name': 'vector_store', 'model': 'all-MiniLM-L6-v2'} | Loading sentence transformer embedding model
+2025-08-10 12:56:04.614 | INFO     | logger:wrapper:140 | {'function': 'test_performance'} | Completed test_performance in 0.105s
+2025-08-10 12:56:08.373 | DEBUG    | rag_system:__init__:30 | {'logger_name': 'rag_system', 'anthropic_model': 'claude-sonnet-4-20250514'} | Initializing AI generator
+2025-08-10 12:56:08.373 | INFO     | ai_generator:__init__:58 | {'logger_name': 'ai_generator', 'model': 'claude-sonnet-4-20250514'} | Initializing AI Generator
+2025-08-10 12:56:08.413 | SUCCESS  | ai_generator:__init__:68 | {'logger_name': 'ai_generator'} | AI Generator initialized successfully
+2025-08-10 12:56:08.413 | DEBUG    | rag_system:__init__:33 | {'logger_name': 'rag_system', 'max_history': 2} | Initializing session manager
+2025-08-10 12:56:08.414 | DEBUG    | rag_system:__init__:37 | {'logger_name': 'rag_system'} | Initializing search tools
+2025-08-10 12:56:08.414 | SUCCESS  | rag_system:__init__:44 | {'logger_name': 'rag_system'} | RAG System initialization completed
+2025-08-10 12:56:08.414 | SUCCESS  | app:<module>:50 | {'logger_name': 'app'} | RAG system initialized successfully
+2025-08-10 12:56:08.416 | INFO     | app:startup_event:169 | {'logger_name': 'app'} | Application startup initiated
+2025-08-10 12:56:08.416 | INFO     | app:startup_event:173 | {'logger_name': 'app'} | Loading initial documents from ../docs
+2025-08-10 12:56:08.416 | DEBUG    | logger:wrapper:137 | {'function': 'add_course_folder'} | Starting execution of add_course_folder
+2025-08-10 12:56:08.416 | INFO     | rag_system:add_course_folder:112 | {'logger_name': 'rag_system', 'clear_existing': False} | Processing course folder: ../docs
+2025-08-10 12:56:08.416 | DEBUG    | rag_system:add_course_folder:127 | {'logger_name': 'rag_system'} | Retrieving existing course titles
+2025-08-10 12:56:08.447 | INFO     | rag_system:add_course_folder:129 | {'logger_name': 'rag_system'} | Found 4 existing courses
+2025-08-10 12:56:08.447 | INFO     | rag_system:add_course_folder:136 | {'logger_name': 'rag_system', 'files': ['course3_script.txt', 'course4_script.txt', 'course1_script.txt', 'course2_script.txt']} | Found 4 files to process
+2025-08-10 12:56:08.447 | DEBUG    | rag_system:add_course_folder:141 | {'logger_name': 'rag_system'} | Processing file 1/4: course3_script.txt
+2025-08-10 12:56:08.450 | INFO     | rag_system:add_course_folder:164 | {'logger_name': 'rag_system'} | Course already exists, skipping: Advanced Retrieval for AI with Chroma
+2025-08-10 12:56:08.450 | DEBUG    | rag_system:add_course_folder:141 | {'logger_name': 'rag_system'} | Processing file 2/4: course4_script.txt
+2025-08-10 12:56:08.454 | INFO     | rag_system:add_course_folder:164 | {'logger_name': 'rag_system'} | Course already exists, skipping: Prompt Compression and Query Optimization
+2025-08-10 12:56:08.454 | DEBUG    | rag_system:add_course_folder:141 | {'logger_name': 'rag_system'} | Processing file 3/4: course1_script.txt
+2025-08-10 12:56:08.459 | INFO     | rag_system:add_course_folder:164 | {'logger_name': 'rag_system'} | Course already exists, skipping: Building Towards Computer Use with Anthropic
+2025-08-10 12:56:08.459 | DEBUG    | rag_system:add_course_folder:141 | {'logger_name': 'rag_system'} | Processing file 4/4: course2_script.txt
+2025-08-10 12:56:08.464 | INFO     | rag_system:add_course_folder:164 | {'logger_name': 'rag_system'} | Course already exists, skipping: MCP: Build Rich-Context AI Apps with Anthropic
+2025-08-10 12:56:08.464 | SUCCESS  | rag_system:add_course_folder:176 | {'logger_name': 'rag_system', 'folder_path': '../docs', 'total_courses_added': 0, 'total_chunks_created': 0, 'files_processed': 4} | Course folder processing completed
+2025-08-10 12:56:08.464 | INFO     | logger:wrapper:140 | {'function': 'add_course_folder'} | Completed add_course_folder in 0.048s
+2025-08-10 12:56:08.464 | SUCCESS  | app:startup_event:179 | {'logger_name': 'app', 'courses_loaded': 0, 'chunks_created': 0, 'loading_time': '0.048s'} | Document loading completed
+2025-08-10 12:56:08.464 | SUCCESS  | app:startup_event:190 | {'logger_name': 'app'} | Application startup completed
+2025-08-10 12:56:28.185 | INFO     | app:<module>:24 | {'logger_name': 'app'} | Initializing Course Materials RAG System
+2025-08-10 12:56:28.186 | INFO     | app:<module>:43 | {'logger_name': 'app', 'config': {'chunk_size': 800, 'max_results': 5, 'anthropic_model': 'claude-sonnet-4-20250514', 'embedding_model': 'all-MiniLM-L6-v2'}} | Initializing RAG system with config
+2025-08-10 12:56:28.186 | INFO     | rag_system:__init__:19 | {'logger_name': 'rag_system', 'config_chunk_size': 800, 'config_max_results': 5} | Initializing RAG System
+2025-08-10 12:56:28.186 | DEBUG    | rag_system:__init__:24 | {'logger_name': 'rag_system'} | Initializing document processor
+2025-08-10 12:56:28.186 | DEBUG    | rag_system:__init__:27 | {'logger_name': 'rag_system', 'chroma_path': './chroma_db', 'embedding_model': 'all-MiniLM-L6-v2'} | Initializing vector store
+2025-08-10 12:56:28.186 | INFO     | vector_store:__init__:42 | {'logger_name': 'vector_store', 'chroma_path': './chroma_db', 'embedding_model': 'all-MiniLM-L6-v2', 'max_results': 5} | Initializing VectorStore
+2025-08-10 12:56:28.186 | DEBUG    | vector_store:__init__:47 | {'logger_name': 'vector_store', 'path': './chroma_db'} | Creating ChromaDB persistent client
+2025-08-10 12:56:28.223 | DEBUG    | vector_store:__init__:54 | {'logger_name': 'vector_store', 'model': 'all-MiniLM-L6-v2'} | Loading sentence transformer embedding model
+2025-08-10 12:56:31.976 | DEBUG    | rag_system:__init__:30 | {'logger_name': 'rag_system', 'anthropic_model': 'claude-sonnet-4-20250514'} | Initializing AI generator
+2025-08-10 12:56:31.976 | INFO     | ai_generator:__init__:58 | {'logger_name': 'ai_generator', 'model': 'claude-sonnet-4-20250514'} | Initializing AI Generator
+2025-08-10 12:56:32.018 | SUCCESS  | ai_generator:__init__:68 | {'logger_name': 'ai_generator'} | AI Generator initialized successfully
+2025-08-10 12:56:32.018 | DEBUG    | rag_system:__init__:33 | {'logger_name': 'rag_system', 'max_history': 2} | Initializing session manager
+2025-08-10 12:56:32.018 | DEBUG    | rag_system:__init__:37 | {'logger_name': 'rag_system'} | Initializing search tools
+2025-08-10 12:56:32.018 | SUCCESS  | rag_system:__init__:44 | {'logger_name': 'rag_system'} | RAG System initialization completed
+2025-08-10 12:56:32.018 | SUCCESS  | app:<module>:50 | {'logger_name': 'app'} | RAG system initialized successfully
+2025-08-10 12:56:32.020 | INFO     | app:startup_event:169 | {'logger_name': 'app'} | Application startup initiated
+2025-08-10 12:56:32.020 | INFO     | app:startup_event:173 | {'logger_name': 'app'} | Loading initial documents from ../docs
+2025-08-10 12:56:32.021 | DEBUG    | logger:wrapper:137 | {'function': 'add_course_folder'} | Starting execution of add_course_folder
+2025-08-10 12:56:32.021 | INFO     | rag_system:add_course_folder:112 | {'logger_name': 'rag_system', 'clear_existing': False} | Processing course folder: ../docs
+2025-08-10 12:56:32.021 | DEBUG    | rag_system:add_course_folder:127 | {'logger_name': 'rag_system'} | Retrieving existing course titles
+2025-08-10 12:56:32.037 | INFO     | rag_system:add_course_folder:129 | {'logger_name': 'rag_system'} | Found 4 existing courses
+2025-08-10 12:56:32.038 | INFO     | rag_system:add_course_folder:136 | {'logger_name': 'rag_system', 'files': ['course3_script.txt', 'course4_script.txt', 'course1_script.txt', 'course2_script.txt']} | Found 4 files to process
+2025-08-10 12:56:32.038 | DEBUG    | rag_system:add_course_folder:141 | {'logger_name': 'rag_system'} | Processing file 1/4: course3_script.txt
+2025-08-10 12:56:32.041 | INFO     | rag_system:add_course_folder:164 | {'logger_name': 'rag_system'} | Course already exists, skipping: Advanced Retrieval for AI with Chroma
+2025-08-10 12:56:32.041 | DEBUG    | rag_system:add_course_folder:141 | {'logger_name': 'rag_system'} | Processing file 2/4: course4_script.txt
+2025-08-10 12:56:32.045 | INFO     | rag_system:add_course_folder:164 | {'logger_name': 'rag_system'} | Course already exists, skipping: Prompt Compression and Query Optimization
+2025-08-10 12:56:32.045 | DEBUG    | rag_system:add_course_folder:141 | {'logger_name': 'rag_system'} | Processing file 3/4: course1_script.txt
+2025-08-10 12:56:32.051 | INFO     | rag_system:add_course_folder:164 | {'logger_name': 'rag_system'} | Course already exists, skipping: Building Towards Computer Use with Anthropic
+2025-08-10 12:56:32.051 | DEBUG    | rag_system:add_course_folder:141 | {'logger_name': 'rag_system'} | Processing file 4/4: course2_script.txt
+2025-08-10 12:56:32.056 | INFO     | rag_system:add_course_folder:164 | {'logger_name': 'rag_system'} | Course already exists, skipping: MCP: Build Rich-Context AI Apps with Anthropic
+2025-08-10 12:56:32.056 | SUCCESS  | rag_system:add_course_folder:176 | {'logger_name': 'rag_system', 'folder_path': '../docs', 'total_courses_added': 0, 'total_chunks_created': 0, 'files_processed': 4} | Course folder processing completed
+2025-08-10 12:56:32.056 | INFO     | logger:wrapper:140 | {'function': 'add_course_folder'} | Completed add_course_folder in 0.035s
+2025-08-10 12:56:32.056 | SUCCESS  | app:startup_event:179 | {'logger_name': 'app', 'courses_loaded': 0, 'chunks_created': 0, 'loading_time': '0.035s'} | Document loading completed
+2025-08-10 12:56:32.056 | SUCCESS  | app:startup_event:190 | {'logger_name': 'app'} | Application startup completed

@@ -4,6 +4,10 @@ from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 from models import Course, CourseChunk
 from sentence_transformers import SentenceTransformer
+from logger import get_logger, log_execution_time
+
+# Initialize logger for this module
+log = get_logger("vector_store")
 
 @dataclass
 class SearchResults:
@@ -35,14 +39,19 @@ class VectorStore:
     """Vector storage using ChromaDB for course content and metadata"""
     
     def __init__(self, chroma_path: str, embedding_model: str, max_results: int = 5):
+        log.info("Initializing VectorStore", chroma_path=chroma_path, embedding_model=embedding_model, max_results=max_results)
+        
         self.max_results = max_results
+        
         # Initialize ChromaDB client
+        log.debug("Creating ChromaDB persistent client", path=chroma_path)
         self.client = chromadb.PersistentClient(
             path=chroma_path,
             settings=Settings(anonymized_telemetry=False)
         )
         
         # Set up sentence transformer embedding function
+        log.debug("Loading sentence transformer embedding model", model=embedding_model)
         self.embedding_function = chromadb.utils.embedding_functions.SentenceTransformerEmbeddingFunction(
             model_name=embedding_model
         )
@@ -111,7 +120,7 @@ class VectorStore:
                 # Return the title (which is now the ID)
                 return results['metadatas'][0][0]['title']
         except Exception as e:
-            print(f"Error resolving course name: {e}")
+            log.error(f"Error resolving course name", error=str(e), error_type=type(e).__name__, query=query)
         
         return None
     
@@ -188,7 +197,7 @@ class VectorStore:
             self.course_catalog = self._create_collection("course_catalog")
             self.course_content = self._create_collection("course_content")
         except Exception as e:
-            print(f"Error clearing data: {e}")
+            log.error(f"Error clearing data", error=str(e), error_type=type(e).__name__)
     
     def get_existing_course_titles(self) -> List[str]:
         """Get all existing course titles from the vector store"""
@@ -199,7 +208,7 @@ class VectorStore:
                 return results['ids']
             return []
         except Exception as e:
-            print(f"Error getting existing course titles: {e}")
+            log.error(f"Error getting existing course titles", error=str(e), error_type=type(e).__name__)
             return []
     
     def get_course_count(self) -> int:
@@ -210,7 +219,7 @@ class VectorStore:
                 return len(results['ids'])
             return 0
         except Exception as e:
-            print(f"Error getting course count: {e}")
+            log.error(f"Error getting course count", error=str(e), error_type=type(e).__name__)
             return 0
     
     def get_all_courses_metadata(self) -> List[Dict[str, Any]]:
@@ -230,7 +239,7 @@ class VectorStore:
                 return parsed_metadata
             return []
         except Exception as e:
-            print(f"Error getting courses metadata: {e}")
+            log.error(f"Error getting courses metadata", error=str(e), error_type=type(e).__name__)
             return []
 
     def get_course_link(self, course_title: str) -> Optional[str]:
@@ -243,7 +252,7 @@ class VectorStore:
                 return metadata.get('course_link')
             return None
         except Exception as e:
-            print(f"Error getting course link: {e}")
+            log.error(f"Error getting course link", course_title=course_title, error=str(e), error_type=type(e).__name__)
             return None
     
     def get_lesson_link(self, course_title: str, lesson_number: int) -> Optional[str]:
@@ -263,5 +272,5 @@ class VectorStore:
                             return lesson.get('lesson_link')
             return None
         except Exception as e:
-            print(f"Error getting lesson link: {e}")
+            log.error(f"Error getting lesson link", course_title=course_title, lesson_title=lesson_title, error=str(e), error_type=type(e).__name__)
     

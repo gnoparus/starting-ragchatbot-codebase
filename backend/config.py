@@ -24,6 +24,14 @@ class Config:
     
     # Database paths
     CHROMA_PATH: str = "./chroma_db"  # ChromaDB storage location
+    
+    # Logging configuration
+    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")  # TRACE, DEBUG, INFO, SUCCESS, WARNING, ERROR, CRITICAL
+    LOG_TO_CONSOLE: bool = os.getenv("LOG_TO_CONSOLE", "true").lower() == "true"
+    LOG_TO_FILE: bool = os.getenv("LOG_TO_FILE", "true").lower() == "true"
+    LOG_FILE_PATH: str = os.getenv("LOG_FILE_PATH", "./logs")
+    LOG_ROTATION: str = os.getenv("LOG_ROTATION", "10 MB")  # File size for rotation
+    LOG_RETENTION: str = os.getenv("LOG_RETENTION", "7 days")  # How long to keep logs
 
 config = Config()
 
