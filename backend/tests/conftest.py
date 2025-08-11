@@ -1,18 +1,21 @@
 """Shared pytest fixtures for RAG system tests"""
-import pytest
-import tempfile
-import shutil
+
 import os
-from unittest.mock import Mock, MagicMock
-from typing import List, Dict, Any
+import shutil
 
 # Import system modules
 import sys
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import tempfile
+from typing import Any, Dict, List
+from unittest.mock import MagicMock, Mock
 
-from models import Course, Lesson, CourseChunk
-from vector_store import VectorStore, SearchResults
+import pytest
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
 from config import Config
+from models import Course, CourseChunk, Lesson
+from vector_store import SearchResults, VectorStore
 
 
 @pytest.fixture
@@ -36,14 +39,14 @@ def sample_course():
             Lesson(
                 lesson_number=0,
                 title="Introduction",
-                lesson_link="https://learn.deeplearning.ai/courses/building-toward-computer-use-with-anthropic/lesson/a6k0z/introduction"
+                lesson_link="https://learn.deeplearning.ai/courses/building-toward-computer-use-with-anthropic/lesson/a6k0z/introduction",
             ),
             Lesson(
                 lesson_number=1,
                 title="Getting Started",
-                lesson_link="https://learn.deeplearning.ai/courses/building-toward-computer-use-with-anthropic/lesson/1/getting-started"
-            )
-        ]
+                lesson_link="https://learn.deeplearning.ai/courses/building-toward-computer-use-with-anthropic/lesson/1/getting-started",
+            ),
+        ],
     )
 
 
@@ -55,20 +58,20 @@ def sample_course_chunks(sample_course):
             content="Welcome to Building Toward Computer Use with Anthropic. Built in partnership with Anthropic and taught by Colt Steele.",
             course_title=sample_course.title,
             lesson_number=0,
-            chunk_index=0
+            chunk_index=0,
         ),
         CourseChunk(
             content="In this course, you will learn how to use many of the models and features that all combine to enable computer use.",
             course_title=sample_course.title,
             lesson_number=0,
-            chunk_index=1
+            chunk_index=1,
         ),
         CourseChunk(
             content="Getting started with Anthropic API is simple. First, you need an API key.",
             course_title=sample_course.title,
             lesson_number=1,
-            chunk_index=2
-        )
+            chunk_index=2,
+        ),
     ]
 
 
@@ -78,24 +81,26 @@ def sample_search_results():
     return SearchResults(
         documents=[
             "Welcome to Building Toward Computer Use with Anthropic.",
-            "In this course, you will learn about computer use features."
+            "In this course, you will learn about computer use features.",
         ],
         metadata=[
-            {"course_title": "Building Towards Computer Use with Anthropic", "lesson_number": 0},
-            {"course_title": "Building Towards Computer Use with Anthropic", "lesson_number": 0}
+            {
+                "course_title": "Building Towards Computer Use with Anthropic",
+                "lesson_number": 0,
+            },
+            {
+                "course_title": "Building Towards Computer Use with Anthropic",
+                "lesson_number": 0,
+            },
         ],
-        distances=[0.1, 0.2]
+        distances=[0.1, 0.2],
     )
 
 
 @pytest.fixture
 def sample_empty_results():
     """Sample empty search results"""
-    return SearchResults(
-        documents=[],
-        metadata=[],
-        distances=[]
-    )
+    return SearchResults(documents=[], metadata=[], distances=[])
 
 
 @pytest.fixture
@@ -111,7 +116,7 @@ def mock_vector_store():
     mock_store.search.return_value = SearchResults(
         documents=["Sample document content"],
         metadata=[{"course_title": "Test Course", "lesson_number": 1}],
-        distances=[0.1]
+        distances=[0.1],
     )
     mock_store.get_lesson_link.return_value = "https://example.com/lesson/1"
     return mock_store
@@ -121,13 +126,13 @@ def mock_vector_store():
 def mock_anthropic_client():
     """Mock Anthropic client for testing"""
     mock_client = Mock()
-    
+
     # Mock successful response without tools
     mock_response = Mock()
     mock_response.content = [Mock(text="This is a test response")]
     mock_response.stop_reason = "end_turn"
     mock_client.messages.create.return_value = mock_response
-    
+
     return mock_client
 
 
@@ -136,14 +141,14 @@ def mock_tool_use_response():
     """Mock Anthropic response with tool use"""
     mock_response = Mock()
     mock_response.stop_reason = "tool_use"
-    
+
     # Mock tool use content block
     mock_tool_block = Mock()
     mock_tool_block.type = "tool_use"
     mock_tool_block.name = "search_course_content"
     mock_tool_block.id = "tool_123"
     mock_tool_block.input = {"query": "test query"}
-    
+
     mock_response.content = [mock_tool_block]
     return mock_response
 
@@ -152,7 +157,9 @@ def mock_tool_use_response():
 def mock_final_response():
     """Mock final response after tool use"""
     mock_response = Mock()
-    mock_response.content = [Mock(text="Here is the answer based on the search results")]
+    mock_response.content = [
+        Mock(text="Here is the answer based on the search results")
+    ]
     return mock_response
 
 
@@ -185,7 +192,7 @@ This lesson covers more advanced topics and practical examples.
 def setup_test_environment():
     """Setup test environment"""
     # Ensure we're in the correct directory
-    os.chdir('/Users/keng/repos/starting-ragchatbot-codebase/backend')
+    os.chdir("/Users/keng/repos/starting-ragchatbot-codebase/backend")
     yield
     # Cleanup if needed
 
@@ -199,7 +206,7 @@ def mock_session_manager():
     return mock_manager
 
 
-@pytest.fixture 
+@pytest.fixture
 def sample_tool_definitions():
     """Sample tool definitions for testing"""
     return [
@@ -211,7 +218,7 @@ def sample_tool_definitions():
                 "properties": {
                     "query": {"type": "string", "description": "What to search for"}
                 },
-                "required": ["query"]
-            }
+                "required": ["query"],
+            },
         }
     ]
