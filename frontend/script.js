@@ -1,11 +1,14 @@
 // API base URL - use relative path to work from any host
 const API_URL = '/api';
 
+// Debug configuration
+const DEBUG_ENABLED = localStorage.getItem('ragchat_debug') === 'true';
+
 // Global state
 let currentSessionId = null;
 
 // DOM elements
-let chatMessages, chatInput, sendButton, totalCourses, courseTitles, newChatButton;
+let chatMessages, chatInput, sendButton, totalCourses, courseTitles, newChatButton, themeToggle;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -16,8 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
     totalCourses = document.getElementById('totalCourses');
     courseTitles = document.getElementById('courseTitles');
     newChatButton = document.getElementById('newChatButton');
+    themeToggle = document.getElementById('themeToggle');
     
     setupEventListeners();
+    initializeTheme();
     createNewSession();
     loadCourseStats();
 });
@@ -32,6 +37,17 @@ function setupEventListeners() {
     
     // New chat functionality
     newChatButton.addEventListener('click', clearCurrentChat);
+    
+    // Theme toggle functionality
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+        themeToggle.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleTheme();
+            }
+        });
+    }
     
     // Suggested questions
     document.querySelectorAll('.suggested-item').forEach(button => {
@@ -256,6 +272,84 @@ async function loadCourseStats() {
         if (courseTitles) {
             courseTitles.innerHTML = '<span class="error">Failed to load courses</span>';
         }
+    }
+}
+
+// Debug utility functions
+function logInfo(message, data = null) {
+    if (DEBUG_ENABLED) {
+        if (data) {
+            console.info(`[INFO] ${message}`, data);
+        } else {
+            console.info(`[INFO] ${message}`);
+        }
+    }
+}
+
+function logDebug(message, data = null) {
+    if (DEBUG_ENABLED) {
+        if (data) {
+            console.debug(`[DEBUG] ${message}`, data);
+        } else {
+            console.debug(`[DEBUG] ${message}`);
+        }
+    }
+}
+
+function logError(message, data = null) {
+    if (DEBUG_ENABLED) {
+        if (data) {
+            console.error(`[ERROR] ${message}`, data);
+        } else {
+            console.error(`[ERROR] ${message}`);
+        }
+    }
+}
+
+function startTimer(operation) {
+    const start = performance.now();
+    return {
+        end: () => {
+            const duration = performance.now() - start;
+            logDebug(`${operation} completed in ${duration.toFixed(2)}ms`);
+        }
+    };
+}
+
+// Theme Management Functions
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const defaultTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+    
+    setTheme(defaultTheme);
+    
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+            setTheme(e.matches ? 'dark' : 'light');
+        }
+    });
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+}
+
+function setTheme(theme) {
+    if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+    }
+    
+    // Update theme toggle button aria-label
+    if (themeToggle) {
+        const newLabel = theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode';
+        themeToggle.setAttribute('aria-label', newLabel);
     }
 }
 
