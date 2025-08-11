@@ -222,3 +222,139 @@ def sample_tool_definitions():
             },
         }
     ]
+
+
+# API Test Fixtures
+
+@pytest.fixture
+def test_app():
+    """Create a test FastAPI app without static file mounting"""
+    from fastapi import FastAPI, HTTPException, Request
+    from fastapi.middleware.cors import CORSMiddleware
+    from pydantic import BaseModel
+    from typing import List, Optional
+    import uuid
+    import time
+    
+    # Create minimal app for testing
+    app = FastAPI(title="Course Materials RAG System - Test")
+    
+    # Add CORS middleware
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    
+    # Import request/response models
+    from app import QueryRequest, QueryResponse, CourseStats, Source
+    
+    # Mock RAG system for testing
+    mock_rag = Mock()
+    mock_rag.query.return_value = (
+        "Test answer",
+        [Source(text="Test source", link="https://example.com/test")]
+    )
+    mock_rag.get_course_analytics.return_value = {
+        "total_courses": 2,
+        "course_titles": ["Test Course 1", "Test Course 2"]
+    }
+    mock_rag.session_manager.create_session.return_value = "test_session_123"
+    
+    @app.post("/api/query", response_model=QueryResponse)
+    async def query_documents(request: QueryRequest, http_request: Request):
+        try:
+            session_id = request.session_id
+            if not session_id:
+                session_id = mock_rag.session_manager.create_session()
+            
+            answer, sources = mock_rag.query(request.query, session_id)
+            
+            return QueryResponse(
+                answer=answer,
+                sources=sources,
+                session_id=session_id
+            )
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+    
+    @app.get("/api/courses", response_model=CourseStats)
+    async def get_course_stats(http_request: Request):
+        try:
+            analytics = mock_rag.get_course_analytics()
+            return CourseStats(
+                total_courses=analytics["total_courses"],
+                course_titles=analytics["course_titles"]
+            )
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+    
+    @app.get("/")
+    async def root():
+        return {"message": "Test API"}
+    
+    # Store mock for access in tests
+    app.state.mock_rag = mock_rag
+    
+    return app
+
+
+@pytest.fixture
+def client(test_app):
+    """Create test client for API testing"""
+    from fastapi.testclient import TestClient
+    return TestClient(test_app)
+
+
+@pytest.fixture
+def async_client(test_app):
+    """Create async test client for API testing"""
+    import httpx
+    return httpx.AsyncClient(app=test_app, base_url="http://test")
+
+
+@pytest.fixture
+def sample_query_request():
+    """Sample query request for API testing"""
+    return {
+        "query": "What is computer use?",
+        "session_id": "test_session_123"
+    }
+
+
+@pytest.fixture
+def sample_query_request_no_session():
+    """Sample query request without session ID"""
+    return {
+        "query": "What is computer use?"
+    }
+
+
+@pytest.fixture
+def expected_query_response():
+    """Expected query response structure"""
+    return {
+        "answer": "Test answer",
+        "sources": [{"text": "Test source", "link": "https://example.com/test"}],
+        "session_id": "test_session_123"
+    }
+
+
+@pytest.fixture
+def expected_course_stats():
+    """Expected course stats response"""
+    return {
+        "total_courses": 2,
+        "course_titles": ["Test Course 1", "Test Course 2"]
+    }
+
+
+@pytest.fixture
+def mock_rag_system_with_error():
+    """Mock RAG system that raises errors for testing error handling"""
+    mock_rag = Mock()
+    mock_rag.query.side_effect = Exception("Test error")
+    mock_rag.get_course_analytics.side_effect = Exception("Analytics error")
+    return mock_rag
